@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Blue 2025 Calendar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #0a0a0a;
+            color: #00ccff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .calendar-container {
+            background: #111;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px #00ccff;
+            width: 320px;
+        }
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        .btn {
+            background: none;
+            border: 1px solid #00ccff;
+            color: #00ccff;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background: #00ccff;
+            color: black;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        .day {
+            padding: 10px;
+            border-radius: 5px;
+            background: #222;
+            color: #00ccff;
+            font-size: 16px;
+        }
+        .day-header {
+            font-weight: bold;
+            background: #00ccff;
+            color: black;
+        }
+        .current-day {
+            background: #00ccff !important;
+            color: black !important;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <button class="btn" onclick="prevMonth()">◀</button>
+            <span id="monthYear"></span>
+            <button class="btn" onclick="nextMonth()">▶</button>
+        </div>
+        <div class="calendar-grid" id="calendar">
+            <!-- Days will be inserted here -->
+        </div>
+    </div>
+
+    <script>
+        const monthNames = [
+            "January", "February", "March", "April", "May", "June", 
+            "July", "August", "September", "October", "November", "December"
+        ];
+        const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+        let currentMonth = new Date().getMonth();
+        let currentYear = 2025;  
+
+        function generateCalendar(month, year) {
+            const calendarDiv = document.getElementById("calendar");
+            const monthYearDiv = document.getElementById("monthYear");
+
+            calendarDiv.innerHTML = "";
+            monthYearDiv.textContent = `${monthNames[month]} ${year}`;
+
+            // Add day headers
+            daysOfWeek.forEach(day => {
+                let dayHeader = document.createElement("div");
+                dayHeader.classList.add("day", "day-header");
+                dayHeader.textContent = day;
+                calendarDiv.appendChild(dayHeader);
+            });
+
+            let firstDay = new Date(year, month, 1).getDay();
+            let totalDays = new Date(year, month + 1, 0).getDate();
+            let today = new Date();
+            
+            // Fill empty slots before the first day
+            for (let i = 0; i < firstDay; i++) {
+                let emptyDiv = document.createElement("div");
+                calendarDiv.appendChild(emptyDiv);
+            }
+
+            // Add day numbers
+            for (let day = 1; day <= totalDays; day++) {
+                let dayDiv = document.createElement("div");
+                dayDiv.classList.add("day");
+                dayDiv.textContent = day;
+
+                // Highlight current day (only if in 2025)
+                if (year === 2025 && month === today.getMonth() && day === today.getDate()) {
+                    dayDiv.classList.add("current-day");
+                }
+
+                calendarDiv.appendChild(dayDiv);
+            }
+        }
+
+        function prevMonth() {
+            currentMonth = (currentMonth === 0) ? 11 : currentMonth - 1;
+            generateCalendar(currentMonth, currentYear);
+        }
+
+        function nextMonth() {
+            currentMonth = (currentMonth === 11) ? 0 : currentMonth + 1;
+            generateCalendar(currentMonth, currentYear);
+        }
+
+        generateCalendar(currentMonth, currentYear);
+    </script>
+
+</body>
+</html>
