@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>9O SNKE</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: 'Press Start 2P', sans-serif;
+            background-color: black;
+            color: white;
+        }
+        h1 {
+            font-size: 24px;
+        }
+        #gameCanvas {
+            background: url('https://i.imgur.com/F3FUMZj.png'); /* Green grass pixel background */
+            border: 4px solid white;
+            image-rendering: pixelated;
+        }
+        .controls {
+            margin-top: 10px;
+        }
+        .control-btn {
+            background: white;
+            color: black;
+            font-size: 18px;
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+            border: 2px solid black;
+            font-family: 'Press Start 2P', sans-serif;
+        }
+        .control-btn:active {
+            background: yellow;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>9O SNKE</h1>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <div class="controls">
+        <button class="control-btn" onclick="setControl('keyboard')">Keyboard</button>
+        <button class="control-btn" onclick="setControl('touch')">Touch</button>
+    </div>
+    <div id="touchControls" class="controls" style="display: none;">
+        <button class="control-btn" onclick="changeDirection('up')">↑</button><br>
+        <button class="control-btn" onclick="changeDirection('left')">←</button>
+        <button class="control-btn" onclick="changeDirection('down')">↓</button>
+        <button class="control-btn" onclick="changeDirection('right')">→</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        const gridSize = 20;
+        let snake = [{ x: 200, y: 200 }];
+        let food = { x: 100, y: 100 };
+        let direction = "right";
+        let gameLoop;
+        let controlMode = "keyboard";
+
+        function drawPixelRect(x, y, color) {
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, gridSize, gridSize);
+            ctx.strokeStyle = "black";
+            ctx.strokeRect(x, y, gridSize, gridSize);
+        }
+
+        function drawGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw food
+            drawPixelRect(food.x, food.y, "yellow");
+
+            // Draw snake
+            snake.forEach((segment, index) => {
+                drawPixelRect(segment.x, segment.y, index === 0 ? "darkred" : "red");
+            });
+        }
+
+        function updateGame() {
+            const head = { ...snake[0] };
+
+            switch (direction) {
+                case "up": head.y -= gridSize; break;
+                case "down": head.y += gridSize; break;
+                case "left": head.x -= gridSize; break;
+                case "right": head.x += gridSize; break;
+            }
+
+            // Collision detection
+            if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height || snake.some(s => s.x === head.x && s.y === head.y)) {
+                clearInterval(gameLoop);
+                alert("Game Over! Refresh to restart.");
+                return;
+            }
+
+            snake.unshift(head);
+            if (head.x === food.x && head.y === food.y) {
+                food = { x: Math.floor(Math.random() * (canvas.width / gridSize)) * gridSize, y: Math.floor(Math.random() * (canvas.height / gridSize)) * gridSize };
+            } else {
+                snake.pop();
+            }
+
+            drawGame();
+        }
+
+        function changeDirection(newDirection) {
+            if ((newDirection === "up" && direction !== "down") ||
+                (newDirection === "down" && direction !== "up") ||
+                (newDirection === "left" && direction !== "right") ||
+                (newDirection === "right" && direction !== "left")) {
+                direction = newDirection;
+            }
+        }
+
+        function setControl(mode) {
+            controlMode = mode;
+            if (mode === "touch") {
+                document.getElementById("touchControls").style.display = "block";
+            } else {
+                document.getElementById("touchControls").style.display = "none";
+            }
+        }
+
+        window.addEventListener("keydown", (e) => {
+            if (controlMode === "keyboard") {
+                switch (e.key) {
+                    case "ArrowUp": changeDirection("up"); break;
+                    case "ArrowDown": changeDirection("down"); break;
+                    case "ArrowLeft": changeDirection("left"); break;
+                    case "ArrowRight": changeDirection("right"); break;
+                }
+            }
+        });
+
+        gameLoop = setInterval(updateGame, 150);
+    </script>
+
+</body>
+</html>
